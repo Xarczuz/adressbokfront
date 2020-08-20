@@ -18,7 +18,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.refresh()
+    this.refresh();
   }
 
   refresh() {
@@ -37,8 +37,7 @@ class App extends Component {
 
   handleCheck(event) {
     event.preventDefault();
-
-    let id = event.currentTarget.value;
+    let id = event.currentTarget.id;
     const requestOptions = {
       method: 'DELETE',
       'Access-Control-Allow-Origin': '*',
@@ -47,8 +46,7 @@ class App extends Component {
     let link = API + '/' + id;
     console.log(link);
 
-    fetch(link, requestOptions)
-      .then((data) => this.refresh());
+    fetch(link, requestOptions).then((data) => this.refresh());
   }
 
   render() {
@@ -61,12 +59,15 @@ class App extends Component {
           <button onClick={this.refresh}>refresh</button>
           <button onClick={this.showForm}>add Address</button>
         </div>
-        {showForm && <Form refresh ={this.refresh}/>}
+        {showForm && <Form refresh={this.refresh} />}
         <div className="list">
           <ul>
             {this.state.items.map(function (data, index) {
               return (
-                <li onClick={this.handleCheck} className="address" key={index} data-id={data.id} value={data.id}>
+                <li className="address" key={index} data-id={data.id}>
+                  <span onClick={this.handleCheck} className="close" id={data.id}>
+                    &times;
+                  </span>
                   <p>Id: {data.id}</p>
                   <p>Name: {data.firstname + ' ' + data.lastname}</p>
                   <p>PhoneNr: {data.phonenr}</p>
