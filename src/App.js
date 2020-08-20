@@ -1,26 +1,86 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
+import Form from './Form';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import './App.css';
+const API = 'http://localhost:8080/address';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      items: [],
+      showForm: false,
+    };
+    this.refresh = this.refresh.bind(this);
+    this.showForm = this.showForm.bind(this);
+    this.handleCheck = this.handleCheck.bind(this);
+  }
+
+  componentDidMount() {
+    this.refresh()
+  }
+
+  refresh() {
+    fetch(API)
+      .then((response) => response.json())
+      .then((items) => this.setState({ items: items }));
+  }
+
+  showForm() {
+    if (this.state.showForm) {
+      this.setState({ showForm: false });
+    } else {
+      this.setState({ showForm: true });
+    }
+  }
+
+  handleCheck(event) {
+    event.preventDefault();
+
+    let id = event.currentTarget.value;
+    const requestOptions = {
+      method: 'DELETE',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    };
+    let link = API + '/' + id;
+    console.log(link);
+
+    fetch(link, requestOptions)
+      .then((data) => this.refresh());
+  }
+
+  render() {
+    const { showForm } = this.state;
+
+    return (
+      <div>
+        <h1 className="title">Adressbok</h1>
+        <div className="buttons">
+          <button onClick={this.refresh}>refresh</button>
+          <button onClick={this.showForm}>add Address</button>
+        </div>
+        {showForm && <Form refresh ={this.refresh}/>}
+        <div className="list">
+          <ul>
+            {this.state.items.map(function (data, index) {
+              return (
+                <li onClick={this.handleCheck} className="address" key={index} data-id={data.id} value={data.id}>
+                  <p>Id: {data.id}</p>
+                  <p>Name: {data.firstname + ' ' + data.lastname}</p>
+                  <p>PhoneNr: {data.phonenr}</p>
+                  <p>Email: {data.email}</p>
+                  <p>Country: {data.country}</p>
+                  <p>Address: {data.address}</p>
+                </li>
+              );
+            }, this)}
+          </ul>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;
